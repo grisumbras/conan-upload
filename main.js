@@ -2,6 +2,8 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 
 
+function get_env(name) { return (process.env[name] || '').trim(); }
+
 async function get_output(command, ...args) {
   let output = '';
   const opts = {
@@ -13,11 +15,9 @@ async function get_output(command, ...args) {
   return 'None' != output ? output : '' ;
 }
 
-
 async function inspect_pkg(attr) {
   return await get_output('conan', 'inspect', '.', '--raw', attr);
 }
-
 
 async function get_input_or_pkg_attr(attr) {
   let result = core.getInput(attr);
@@ -25,46 +25,32 @@ async function get_input_or_pkg_attr(attr) {
   return result;
 }
 
-
 async function get_pkg_user() {
   let result = core.getInput('user');
 
-  if (!result) { result = (process.env['CONAN_USERNAME'] || '').trim(); }
+  if (!result) { result = get_env('CONAN_USERNAME'); }
 
   if (!result) { result = await inspect_pkg('default_user'); }
 
   if (!result) {
-    const repo = process.env['GITHUB_REPOSITORY'] || '';
-    result = (repo.split('/', 1) || [''])[0].trim();
+    const repo = get_env('GITHUB_REPOSITORY');
+    result = (repo.split('/', 1) || [ '' ])[0].trim();
   }
 
   return result;
 }
-
 
 async function get_pkg_channel() {
   let result = core.getInput('channel');
 
-  if (!result) {
-    const stable_channel
-      = (process.env['CONAN_STABLE_CHANNEL'] || '').trim()
-      || 'stable';
-    const testing_channel
-      = (process.env['CONAN_CHANNEL'] || '').trim()
-      || (await inspect_pkg('default_channel'))
-      || 'testing';
+  if (!result) { result = get_env('CONAN_CHANNEL'); }
 
-    const git_ref = process.env['GITHUB_REF'].split('/', 3)[2].trim();
-    const stable_pattern
-      = (process.env['CONAN_STABLE_BRANCH_PATTERN'] || '').trim()
-      || '^(master$|release.*|stable.*)';
+  if (!result) { result = await inspect_pkg('default_channel'); }
 
-    result = git_ref.match(stable_pattern) ? stable_channel : testing_channel;
-  }
+  if (!result) { result = 'testing'; }
 
   return result;
 }
-
 
 async function get_pkg_reference() {
   let result = core.getInput('reference');
@@ -78,7 +64,6 @@ async function get_pkg_reference() {
   return result;
 }
 
-
 async function get_upload_remote() {
   let result = {}
 
@@ -86,18 +71,16 @@ async function get_upload_remote() {
   if (!result.name) { result.name = 'upload'; }
 
   result.url = core.getInput('url');
-  if (!result.url) { result.url = (process.env['CONAN_UPLOAD'] || '').trim(); }
+  if (!result.url) { result.url = get_env('CONAN_UPLOAD'); }
 
   return result;
 }
-
 
 async function get_login_username() {
   let result = core.getInput('login');
   if (!result) { result = await get_pkg_user(); }
   return result;
 }
-
 
 async function run() {
   const remote = await get_upload_remote();
