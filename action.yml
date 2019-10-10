@@ -1,0 +1,29 @@
+name: conan-upload
+author: Dmitry Arkhipov <grisumbras@gmail.com>
+description: Uploads a package to Conan server
+branding:
+  icon: upload
+  color: blue
+inputs:
+  login:
+    description: Username to authenticate as
+  password:
+    description: Password to use to authenticate
+    required: true
+  url:
+    description: URL of the Conan remote to upload to
+  remote:
+    description: Name of the Conan remote to upload to
+  name:
+    description: Package name
+  version:
+    description: Package description
+  channel:
+    description: Package channel
+  user:
+    description: Package user
+  reference:
+    description: Full package reference
+runs:
+  using: node12
+  main: main.js
