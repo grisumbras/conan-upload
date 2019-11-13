@@ -1,0 +1,81 @@
+= conan-upload
+:toc: preamble
+
+[link=https://github.com/grisumbras/conan-upload/actions]
+image::https://github.com/grisumbras/conan-upload/workflows/ci/badge.svg[Build status]
+
+____
+GitHub Action that uploads a package to Conan server
+____
+
+
+== Usage
+The action authenticates against the Conan remote to upload to, then uploads a
+package.
+
+Example usage:
+
+[source,yaml]
+----
+uses: grisumbras/conan-upload@latest
+with:
+  login: johndoe
+  password: ${{ secrets.SECRET_CONAN_PASSSWORD }}
+  url: https://api.bintray.com/conan/johndoe/conan-public
+----
+
+
+== Inputs
+
+=== `login`
+Username to authenticate as. If not present package's user is used.
+
+=== `password`
+Password to use to authenticate. This is normally stored as a repository
+secret.
+
+=== `url`
+URL of the remote to upload to. If not specified, `CONAN_UPLOAD` environment
+variable is used.
+
+=== `remote`
+URL of the remote to upload to. If not specified, the string `upload` is used.
+
+=== `name`
+Name of the package to export. If not specified, `name` attribute of the
+package recipe is used.
+
+=== `version`
+Version  of the package to export. If not specified, `version` attribute of the
+package recipe is used.
+
+=== `user`
+User (namespace) of the package to export. If not specified
+
+. `CONAN_USERNAME` environment variable is used, if present;
+. or `default_user` attribute of the package recipe is used, if present;
+. or the first part of the value of `GITHUB_REPOSITORY` environment variable
+  (before the slash) is used.
+
+=== `channel`
+Channel of the package to export. If not specified
+
+. `CONAN_CHANNEL` environment variable is used, if present;
+. or `default_channel` attribute of the package recipe is used, if present;
+. or the string `testing`.
+
+=== `reference`
+Full reference of the package to export. If specified all inputs that specify
+parts of the reference are ignored.
+
+
+== Maintainer
+Dmitry Arkhipov <grisumbras@gmail.com>
+
+
+== Contributing
+Patches welcome!
+
+
+== License
+link:LICENSE[BSL-1.0] (C) 2019 Dmitry Arkhipov
