@@ -86,7 +86,9 @@ async function run() {
   const remote = await get_upload_remote();
   console.log()
   console.log(`Using remote ${remote.name}(${remote.url})`);
-  await exec.exec('conan', ['remote', 'add', remote.name, remote.url]);
+  exec.exec('conan', ['remote', 'add', remote.name, remote.url]).then(
+    (resolve) => {},
+    (reject) => {});
 
   const user = await get_login_username()
   const password = core.getInput('password');
@@ -103,4 +105,6 @@ async function run() {
   );
 }
 
-run()
+run().then(
+  (resolve) => {},
+  (reject) => { core.setFailed(`Action failed with error ${reject}`); });
